@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Подписки{% endblock %}
+{% load static %}
+{% block content %}
+  <div class="container py-5">
+    {% for post in page_obj %}
+    {% include 'includes/article.html' with index_page=True %}
+    {% endfor %}
+    {% include 'posts/includes/paginator.html' %}
+  </div>
+{% endblock content %}
