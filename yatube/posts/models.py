@@ -35,7 +35,7 @@ class Post(CreatedModel):
         'Картинка',
         upload_to='posts/',
         blank=True
-    )  
+    )
 
     def __str__(self):
         return self.text[0:15]
@@ -52,7 +52,7 @@ class Comment(CreatedModel):
         related_name='comments',
         blank=True,
         null=True,
-        )
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -77,6 +77,7 @@ class Follow(models.Model):
         blank=True,
         null=True,
     )
+
     class Meta:
         unique_together = ['user', 'author']
         constraints = [
