@@ -1,6 +1,9 @@
-from django.test import TestCase, Client
-from ..models import Group, Post, User
 from http import HTTPStatus
+
+from django.core.cache import cache
+from django.test import Client, TestCase
+
+from ..models import Group, Post, User
 
 
 class PostURLTests(TestCase):
@@ -18,6 +21,9 @@ class PostURLTests(TestCase):
             text="Test Post",
             group=cls.group,
         )
+
+    def setUp(cls):
+        cache.clear()
 
     def test_urls_correct_template(self):
         self.author = Client()

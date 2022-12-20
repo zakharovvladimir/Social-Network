@@ -1,9 +1,11 @@
-from django.urls import reverse
-from ..models import Post, User, Group
-from django.test import TestCase, Client
 from http import HTTPStatus
-from django.core.files.uploadedfile import SimpleUploadedFile
+
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from ..models import Group, Post, User
 
 
 class FormsTests(TestCase):
@@ -32,9 +34,9 @@ class FormsTests(TestCase):
     def setUp(self):
         cache.clear()
         self.user = User.objects.create(username='auth')
+        self.authorized_client = Client()
 
     def test_authorized_edit_post(self):
-        self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.post = Post.objects.create(
             author=self.user,
@@ -59,7 +61,6 @@ class FormsTests(TestCase):
         self.assertEqual(get_post.author, self.post.author)
 
     def test_authorized_create_post(self):
-        self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         posts_counter = Post.objects.count()
         form_data = {
@@ -95,8 +96,11 @@ class FormsTests(TestCase):
             data=form_data,
             follow=True,)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertRedirects(response,
-                             '/auth/login/?next=/posts/1/edit/')
+        self.assertRedirects(
+            response,
+            '/auth/login/?next=' + reverse('posts:post_edit',
+                                           kwargs={'post_id': self.post.id})
+        )
 
     def test_guest_client_edit_post_restriction(self):
         self.guest_client = Client()

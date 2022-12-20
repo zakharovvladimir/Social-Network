@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Посты пользователя {{author.get_full_name}}{% endblock %}
-{% block content %}
-  <div class="container py-5">        
+{% block content %}        
     <h1>Все посты пользователя {{author.get_full_name}} </h1>
     <h3>Всего постов: {{author.author_posts.count}} </h3>
     {% if user != author and request.user.is_authenticated %}
@@ -25,5 +24,4 @@
     {% include 'includes/article.html' with profile_page=True %}
     {% endfor %}
     {% include 'posts/includes/paginator.html' %}
-  </div>
 {% endblock %}

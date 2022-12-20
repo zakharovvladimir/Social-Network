@@ -5,7 +5,6 @@
       <li>
         Автор: {{post.author.get_full_name}}
         {% if profile_page %}
-          <br><a href="{% url 'posts:profile' author.username %}">все посты пользователя</a>
         {% endif %}
       </li>
       <li>
@@ -18,19 +17,28 @@
     <p>{{post.text}}</p>
     {% if index_page %}
       {% if post.group %}
+        <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a>
         <a href="{% url 'posts:group_list' post.group.slug %}">Все записи группы</a>
       {% endif %}
       {% if not forloop.last %}
-      <hr>
+        <hr>
       {% endif %}
     {% endif %}
     {% if profile_page %}
       {% if not group and post.group %}
-        <a href="{% url 'posts:post_detail' post.id %}">подробная информация</a>
+        <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a>
       {% endif %} 
-      {% if post.group %}     
-        <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+      {% if post.group %}
+      <a href="{% url 'posts:group_list' post.group.slug %}">Все записи группы</a>
       {% endif %}       
       {% if not forloop.last %}<hr>{% endif %}
+    {% endif %}
+    {% if group_list_page %}
+      {% if post.group %}
+        <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a>
+      {% endif %}
+      {% if not forloop.last %}
+        <hr>
+      {% endif %}
     {% endif %}
 </article>

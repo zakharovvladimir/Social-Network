@@ -1,20 +1,17 @@
 {% extends 'base.html' %}
 {% block title %}Записи сообщества {{group.title}}{% endblock %}
-{% load static %}
 {% block content %}
-  <div class="container py-5">
     <h1>{{group.title}}</h1>
     <p>{{group.description}}</p>
     {% for post in posts %}
-    {% include 'includes/article.html' %}
-      {% if not forloop.last %}
-      <hr>
-      {% endif %}
-      {% if forloop.last %}
-      <br>
-      {% endif %}
+      {% include 'includes/article.html' with group_list_page=True %}
+        {% if not forloop.last %}
+          <hr>
+        {% endif %}
+        {% if forloop.last %}
+          <br>
+        {% endif %}
     {% endfor %}
     {% include 'posts/includes/paginator.html' %}
-  </div>
 {% endblock %}
 {% include 'includes/footer.html' %}

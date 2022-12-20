@@ -11,6 +11,10 @@ class Group(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField()
 
+    class Meta():
+        verbose_name = 'Группа'
+        verbose_name_plural = 'Группы'
+
     def __str__(self) -> str:
         return self.title
 
@@ -34,15 +38,15 @@ class Post(CreatedModel):
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
-        blank=True
+        blank=True,
     )
-
-    def __str__(self):
-        return self.text[0:15]
 
     class Meta(CreatedModel.Meta):
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
+
+    def __str__(self):
+        return self.text[:15]
 
 
 class Comment(CreatedModel):
@@ -52,6 +56,7 @@ class Comment(CreatedModel):
         related_name='comments',
         blank=True,
         null=True,
+        verbose_name='Комментарий'
     )
     author = models.ForeignKey(
         User,
@@ -59,7 +64,12 @@ class Comment(CreatedModel):
         related_name='comments',
         blank=True,
         null=True,
+        verbose_name='Автор'
     )
+
+    class Meta(CreatedModel.Meta):
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
 
 class Follow(models.Model):
@@ -69,6 +79,7 @@ class Follow(models.Model):
         related_name='follower',
         blank=True,
         null=True,
+        verbose_name='Подписчик'
     )
     author = models.ForeignKey(
         User,
@@ -76,6 +87,7 @@ class Follow(models.Model):
         related_name='following',
         blank=True,
         null=True,
+        verbose_name='Автор для подписки'
     )
 
     class Meta:
@@ -86,3 +98,5 @@ class Follow(models.Model):
                 name='user is not author',
             ),
         ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'

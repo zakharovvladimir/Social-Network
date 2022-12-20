@@ -1,27 +1,27 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Group, User, Follow
 from .forms import PostForm, CommentForm
-from .utils import paginator_context
+from .utils import paginate_page
 from django.contrib.auth.decorators import login_required
-# Uncomment if cache is activated:
-# from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page
 
 
-# @cache_page(20, key_prefix='index_page')
+@cache_page(20, key_prefix='index_page')
 def index(request):
     context = {
-        'page_obj': paginator_context(Post.objects.all(), request),
+        'page_obj': paginate_page(Post.objects.select_related('author').all(),
+                                  request),
     }
     return render(request, 'posts/index.html', context)
 
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.group_posts.all()
+    post = group.group_posts.select_related('author').all()
     context = {
         'group': group,
-        'posts': posts,
-        'page_obj': paginator_context(group.group_posts.all(), request),
+        'posts': post,
+        'page_obj': paginate_page(group.group_posts.all(), request),
     }
     return render(request, 'posts/group_list.html', context)
 
@@ -30,7 +30,8 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     context = {
         'author': author,
-        'page_obj': paginator_context(author.author_posts.all(), request),
+        'page_obj': paginate_page(author.author_posts.select_related(
+            'author').all(), request),
         'following':
             request.user.is_authenticated
             and request.user != author
@@ -41,11 +42,11 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
-    posts = get_object_or_404(Post, id=post_id)
+    post = get_object_or_404(Post, id=post_id)
     context = {
-        'post': posts,
+        'post': post,
         'form': CommentForm(),
-        'comments': posts.comments.all(),
+        'comments': post.comments.all(),
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -97,7 +98,7 @@ def add_comment(request, post_id):
 @login_required
 def follow_index(request):
     context = {
-        'page_obj': paginator_context(Post.objects.filter(
+        'page_obj': paginate_page(Post.objects.filter(
             author__following__user=request.user), request),
     }
     return render(request, 'posts/follow.html', context)

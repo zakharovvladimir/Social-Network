@@ -1,13 +1,13 @@
-from django.test import TestCase, Client
-from ..models import User, Post, Group, Follow
-from django.urls import reverse
-from django.conf import settings
 from django import forms
-from ..forms import PostForm
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-# Uncomment if cache is activated:
-# from django.core.cache import cache
-# import time
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from ..forms import PostForm
+from ..models import Follow, Group, Post, User
+
+from django.core.cache import cache
 
 
 class PostPagesTests(TestCase):
@@ -70,6 +70,7 @@ class PostPagesTests(TestCase):
         )
 
     def setUp(self):
+        cache.clear()
         self.authorized_client = Client()
         self.authorized_client.force_login(PostPagesTests.user)
 
@@ -227,14 +228,19 @@ class PostPagesTests(TestCase):
         self.assertContains(response, 'TestComment')
         self.assertRedirects(response, redirect_url, status_code=302)
 
-    # IMPORTANT: Uncomment while cache is activated:
-    # def test_cache(self):
-    #    response = self.authorized_client.get(reverse('posts:index'))
-    #    self.assertEqual(response.context, None)
-    #    time.sleep(20)
-    #    response = self.authorized_client.get(reverse('posts:index'))
-    #    self.assertNotEqual(response.context, None)
-    #    self.assertEqual(response.context['page_obj'][0].text, 'TestPost')
+    def test_cache(self):
+        cache_post = Post.objects.create(
+            text='CachePostText',
+            author=self.user,
+        )
+        post_add = self.authorized_client.get(reverse('posts:index')).content
+        cache_post.delete()
+        post_del = self.authorized_client.get(reverse('posts:index')).content
+        self.assertEqual(post_add, post_del)
+        cache.clear()
+        post_clear_cache = self.authorized_client.get(
+            reverse('posts:index')).content
+        self.assertNotEqual(post_add, post_clear_cache)
 
     def test_follow(self):
         follow_user = User.objects.create(username='TestAuthor')
@@ -277,6 +283,7 @@ class PaginatorViewsTest(TestCase):
         cls.post = Post.objects.latest('created')
 
     def setUp(self):
+        cache.clear()
         self.client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(PaginatorViewsTest.user)

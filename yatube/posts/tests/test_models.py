@@ -1,9 +1,7 @@
-from django.test import TestCase
-from django.contrib.auth import get_user_model
-from ..models import Group, Post
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
 
-User = get_user_model()
+from ..models import Group, Post, User
 
 
 class PostModelTest(TestCase):
