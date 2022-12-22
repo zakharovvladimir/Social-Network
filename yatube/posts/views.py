@@ -8,9 +8,9 @@ from django.views.decorators.cache import cache_page
 
 @cache_page(20, key_prefix='index_page')
 def index(request):
+    query_set = Post.objects.select_related('author', 'group').all()
     context = {
-        'page_obj': paginate_page(Post.objects.select_related('author').all(),
-                                  request),
+        'page_obj': paginate_page(query_set, request),
     }
     return render(request, 'posts/index.html', context)
 
@@ -18,20 +18,21 @@ def index(request):
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     post = group.group_posts.select_related('author').all()
+    query_set = group.group_posts.select_related('author').all()
     context = {
         'group': group,
         'posts': post,
-        'page_obj': paginate_page(group.group_posts.all(), request),
+        'page_obj': paginate_page(query_set, request),
     }
     return render(request, 'posts/group_list.html', context)
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
+    query_set = author.author_posts.select_related('group').all()
     context = {
         'author': author,
-        'page_obj': paginate_page(author.author_posts.select_related(
-            'author').all(), request),
+        'page_obj': paginate_page(query_set, request),
         'following':
             request.user.is_authenticated
             and request.user != author
@@ -97,21 +98,21 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
+    query_set = Post.objects.filter(author__following__user=request.user)
     context = {
-        'page_obj': paginate_page(Post.objects.filter(
-            author__following__user=request.user), request),
+        'page_obj': paginate_page(query_set, request),
     }
     return render(request, 'posts/follow.html', context)
 
 
 @login_required
 def profile_follow(request, username):
-    follower = Follow()
     if request.user.username == username:
         return redirect('posts:index')
     author = get_object_or_404(User, username=username)
     if Follow.objects.filter(user=request.user, author=author).exists():
         return redirect('posts:index')
+    follower = Follow()
     follower.author = author
     follower.user = request.user
     follower.save()

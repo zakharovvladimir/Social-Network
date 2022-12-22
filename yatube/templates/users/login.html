@@ -8,12 +8,12 @@
           Войти на сайт
         </div>
         <div class="card-body">
-          {% include 'users/includes/errors_check.html' %}
           <form method="post"
             {% if action_url %}
               action="{% url action_url %}"
             {% endif %}
           >
+          {% include 'users/includes/errors_check.html' %}
           {% csrf_token %}
           {% for field in form %}
             {% include 'users/includes/form_check.html' %}
