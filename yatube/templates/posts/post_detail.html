@@ -33,7 +33,9 @@
           <p>
             {{post.text|linebreaks}}
           </p>
+          {% if user.username == post.author.username %}
           <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">Редактировать</a>
+          {% endif %}
             {% if user.is_authenticated %}
               <div class="card my-4">
                 <h5 class="card-header">Добавить комментарий:</h5>

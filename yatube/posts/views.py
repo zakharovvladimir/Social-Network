@@ -8,31 +8,33 @@ from django.views.decorators.cache import cache_page
 
 @cache_page(20, key_prefix='index_page')
 def index(request):
-    query_set = Post.objects.select_related('author', 'group').all()
+    '''Homepage return'''
+    posts = Post.objects.select_related('author', 'group').all()
     context = {
-        'page_obj': paginate_page(query_set, request),
+        'page_obj': paginate_page(posts, request),
     }
     return render(request, 'posts/index.html', context)
 
 
 def group_posts(request, slug):
+    '''Group page return'''
     group = get_object_or_404(Group, slug=slug)
-    post = group.group_posts.select_related('author').all()
-    query_set = group.group_posts.select_related('author').all()
+    posts = group.group_posts.select_related('author').all()
     context = {
         'group': group,
-        'posts': post,
-        'page_obj': paginate_page(query_set, request),
+        'posts': posts,
+        'page_obj': paginate_page(posts, request),
     }
     return render(request, 'posts/group_list.html', context)
 
 
 def profile(request, username):
+    '''Profile page return'''
     author = get_object_or_404(User, username=username)
-    query_set = author.author_posts.select_related('group').all()
+    posts = author.author_posts.select_related('group').all()
     context = {
         'author': author,
-        'page_obj': paginate_page(query_set, request),
+        'page_obj': paginate_page(posts, request),
         'following':
             request.user.is_authenticated
             and request.user != author
@@ -43,6 +45,7 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
+    '''Post detail page return'''
     post = get_object_or_404(Post, id=post_id)
     context = {
         'post': post,
@@ -54,6 +57,7 @@ def post_detail(request, post_id):
 
 @login_required
 def post_edit(request, post_id):
+    '''Post edit return'''
     posts = get_object_or_404(Post, id=post_id)
     if request.user != posts.author:
         return redirect('posts:post_detail', post_id)
@@ -72,6 +76,7 @@ def post_edit(request, post_id):
 
 @login_required
 def post_create(request):
+    '''Post create return'''
     form = PostForm(request.POST or None)
     if form.is_valid():
         new_post = form.save(commit=False)
@@ -86,6 +91,7 @@ def post_create(request):
 
 @login_required
 def add_comment(request, post_id):
+    '''Add comment return. Get the post and save it in the post variable'''
     post = get_object_or_404(Post, id=post_id)
     form = CommentForm(request.POST or None)
     if form.is_valid():
@@ -98,29 +104,33 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    query_set = Post.objects.filter(author__following__user=request.user)
+    '''Information about the current user is available in the variable
+    request.user'''
+    request_user = Post.objects.filter(author__following__user=request.user)
     context = {
-        'page_obj': paginate_page(query_set, request),
+        'page_obj': paginate_page(request_user, request),
     }
     return render(request, 'posts/follow.html', context)
 
 
 @login_required
 def profile_follow(request, username):
-    if request.user.username == username:
-        return redirect('posts:index')
+    '''Subscription follow function'''
     author = get_object_or_404(User, username=username)
-    if Follow.objects.filter(user=request.user, author=author).exists():
+    if request.user.username == username or Follow.objects.filter(
+        user=request.user, author=author
+    ).exists():
         return redirect('posts:index')
-    follower = Follow()
-    follower.author = author
-    follower.user = request.user
+    follower = Follow.objects.create(
+        author=author, user=request.user,
+    )
     follower.save()
     return redirect('posts:profile', username)
 
 
 @login_required
 def profile_unfollow(request, username):
+    '''Subscription unfollow function'''
     author = get_object_or_404(User, username=username)
     following = Follow.objects.filter(user=request.user, author=author)
     if following.exists():

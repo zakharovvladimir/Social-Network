@@ -1,5 +1,4 @@
 {% load thumbnail %}
-
 <article>
     <ul>
       <li>
@@ -15,30 +14,12 @@
     <img class="card-img my-2" src="{{ im.url }}">
     {% endthumbnail %}
     <p>{{post.text}}</p>
-    {% if index_page %}
-      {% if post.group %}
+    {% if not profile_page %}
         <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a>
+    {% endif %}
+    {% if not group_list_page %}
+      {% if post.group %}
         <a href="{% url 'posts:group_list' post.group.slug %}">Все записи группы</a>
-      {% endif %}
-      {% if not forloop.last %}
-        <hr>
-      {% endif %}
-    {% endif %}
-    {% if profile_page %}
-      {% if not group and post.group %}
-        <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a>
-      {% endif %} 
-      {% if post.group %}
-      <a href="{% url 'posts:group_list' post.group.slug %}">Все записи группы</a>
-      {% endif %}       
-      {% if not forloop.last %}<hr>{% endif %}
-    {% endif %}
-    {% if group_list_page %}
-      {% if post.group %}
-        <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a>
-      {% endif %}
-      {% if not forloop.last %}
-        <hr>
       {% endif %}
     {% endif %}
 </article>

@@ -20,12 +20,7 @@
           </div>
           <div class="card-body">
             {% for field in form %}
-              <form method="post"
-              {% if form.instance.id %}
-                action="{% url 'posts:post_edit' post_id %}"
-              {% else %}
-                action="{% url 'posts:post_create' %}"
-              {% endif %} enctype="multipart/form-data">
+              {% include 'posts/includes/button_action_type.html' %}
               {% csrf_token %}
               <label for="id_text">
                 {{field.label}}

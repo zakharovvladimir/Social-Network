@@ -1,0 +1,6 @@
+<form method="post"
+  {% if form.instance.id %}
+    action="{% url 'posts:post_edit' post_id %}"
+  {% else %}
+    action="{% url 'posts:post_create' %}"
+  {% endif %} enctype="multipart/form-data">

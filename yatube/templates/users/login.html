@@ -10,7 +10,7 @@
         <div class="card-body">
           <form method="post"
             {% if action_url %}
-              action="{% url action_url %}"
+              action="{% url 'posts:login' %}"
             {% endif %}
           >
           {% include 'users/includes/errors_check.html' %}
