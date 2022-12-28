@@ -3,6 +3,12 @@
 {% block content %}
   {% for post in page_obj %}
     {% include 'includes/article.html' with index_page=True %}
+      {% if not forloop.last %}
+        <hr>
+      {% endif %}
+      {% if forloop.last %}
+        <br>
+      {% endif %}
   {% endfor %}
   {% include 'posts/includes/paginator.html' %}
 {% endblock content %}

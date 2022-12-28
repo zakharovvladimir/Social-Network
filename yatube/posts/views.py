@@ -8,7 +8,7 @@ from django.views.decorators.cache import cache_page
 
 @cache_page(20, key_prefix='index_page')
 def index(request):
-    '''Homepage return'''
+    """Homepage return"""
     posts = Post.objects.select_related('author', 'group').all()
     context = {
         'page_obj': paginate_page(posts, request),
@@ -17,7 +17,7 @@ def index(request):
 
 
 def group_posts(request, slug):
-    '''Group page return'''
+    """Group page return"""
     group = get_object_or_404(Group, slug=slug)
     posts = group.group_posts.select_related('author').all()
     context = {
@@ -29,7 +29,7 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    '''Profile page return'''
+    """Profile page return"""
     author = get_object_or_404(User, username=username)
     posts = author.author_posts.select_related('group').all()
     context = {
@@ -45,7 +45,7 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
-    '''Post detail page return'''
+    """Post detail page return"""
     post = get_object_or_404(Post, id=post_id)
     context = {
         'post': post,
@@ -57,7 +57,7 @@ def post_detail(request, post_id):
 
 @login_required
 def post_edit(request, post_id):
-    '''Post edit return'''
+    """Post edit return"""
     posts = get_object_or_404(Post, id=post_id)
     if request.user != posts.author:
         return redirect('posts:post_detail', post_id)
@@ -76,7 +76,7 @@ def post_edit(request, post_id):
 
 @login_required
 def post_create(request):
-    '''Post create return'''
+    """Post create return"""
     form = PostForm(request.POST or None)
     if form.is_valid():
         new_post = form.save(commit=False)
@@ -91,7 +91,7 @@ def post_create(request):
 
 @login_required
 def add_comment(request, post_id):
-    '''Add comment return. Get the post and save it in the post variable'''
+    """Add comment return. Get the post and save it in the post variable"""
     post = get_object_or_404(Post, id=post_id)
     form = CommentForm(request.POST or None)
     if form.is_valid():
@@ -104,18 +104,17 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    '''Information about the current user is available in the variable
-    request.user'''
-    request_user = Post.objects.filter(author__following__user=request.user)
+    """The posts of the authors that the current user is subscribed to"""
+    posts = Post.objects.filter(author__following__user=request.user)
     context = {
-        'page_obj': paginate_page(request_user, request),
+        'page_obj': paginate_page(posts, request),
     }
     return render(request, 'posts/follow.html', context)
 
 
 @login_required
 def profile_follow(request, username):
-    '''Subscription follow function'''
+    """Subscription follow function"""
     author = get_object_or_404(User, username=username)
     if request.user.username == username or Follow.objects.filter(
         user=request.user, author=author
@@ -130,7 +129,7 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    '''Subscription unfollow function'''
+    """Subscription unfollow function"""
     author = get_object_or_404(User, username=username)
     following = Follow.objects.filter(user=request.user, author=author)
     if following.exists():

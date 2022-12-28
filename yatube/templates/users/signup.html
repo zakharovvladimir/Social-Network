@@ -10,7 +10,7 @@
               <form method="post" action="{% url 'users:signup' %}">
               {% csrf_token %}
               {% for field in form %} 
-                {% include 'users/includes/form_check.html' %}
+                {% include 'users/includes/form_output.html' %}
               {% endfor %}
                 <button type="submit" class="btn btn-primary">
                   Зарегистрироваться

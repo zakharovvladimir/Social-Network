@@ -16,7 +16,7 @@
           {% include 'users/includes/errors_check.html' %}
           {% csrf_token %}
           {% for field in form %}
-            {% include 'users/includes/form_check.html' %}
+            {% include 'users/includes/form_output.html' %}
           {% endfor %}
           <div class="col-md-6 offset-md-4">
             <button type="submit" class="btn btn-primary">
