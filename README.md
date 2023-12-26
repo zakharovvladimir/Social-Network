@@ -1,4 +1,4 @@
-# YaTube
+# Social Network
 
 A simple social network with all the basic elements to function and expand.
 
